@@ -11,6 +11,33 @@ df = pd.read_csv(
     sep=";", encoding="utf-8"
 )
 
+# ===============================
+# 🎨 Configurações de cores e hover globais
+# ===============================
+CORES_CATEGORIA = {
+    "Receita": "#2CA02C",
+    "Despesa_Cond": "#1F77B4",
+    "Despesa_DP": "#FF7F0E",
+    "Despesa_Imobilizado": "#D62728",
+    "Despesa_Tributaria": "#9467BD",
+    "Receita_Ordinaria": "#17BECF",
+    "Receita_Extra": "#BCBD22",
+    "Outros": "#7F7F7F"
+}
+
+HOVER_TEMPLATE = "<b>%{label}</b><br>Valor: R$ %{value:,.2f}<br>%{percent}"
+
+# ===============================
+# Função utilitária para padronizar gráficos
+# ===============================
+def padronizar_grafico(fig):
+    fig.update_traces(hovertemplate=HOVER_TEMPLATE)
+    fig.update_layout(
+        legend_title_text='Categoria',
+        template='plotly_white',
+        margin=dict(l=40, r=40, t=60, b=40)
+    )
+    return fig
 
 # ===============================
 # 3️⃣ Mapear categorias
@@ -49,7 +76,7 @@ mapa_classificacao = {
     'Material de Segurança EPI': 'Despesa_DP',
 
     # Despesa_Cond
-    'Caixa Síndico': 'Ignorar',
+    'Caixa Síndico': 'N.A',
     'Conservacao e Manutencao': 'Despesa_Cond',
     'Correio': 'Despesa_Cond',
     'Material de Construçao': 'Despesa_Cond',
@@ -109,120 +136,6 @@ df["ContaNome"] = df["ContaNome"].astype(str).str.strip()
 
 # 3️⃣ Aplicar classificação
 df["Categoria"] = df["ContaNome"].map(mapa_classificacao)
-
-mapa_analise = {
-    # ======================
-    # DESPESAS FIXAS
-    # ======================
-    'Adiantamento de Ferias': 'Despesa_Fixa',
-    'Adiantamento de Salarios': 'Despesa_Fixa',
-    'Assistencia Familiar e  Funeral Sindeac PAF': 'Despesa_Fixa',
-    'Cartao Alimentacao\\Cesta Basica\\Cesta Natal': 'Despesa_Fixa',
-    'Consultoria em Medicina do Trabalho': 'Despesa_Fixa',
-    'FGTS a Pagar': 'Obrigacao_CP',
-    'INSS a Pagar': 'Obrigacao_CP',
-    'Pis s/Folha de Pagamento': 'Obrigacao_CP',
-    'Pro- Labore': 'Despesa_Fixa',
-    'Rescisão': 'Despesa_Variavel',  # não é recorrente
-    'Salario a Pagar': 'Obrigacao_CP',
-    'Servico de Suporte na Administracao': 'Despesa_Fixa',
-    'Sindeac PROFPS': 'Despesa_Fixa',
-    'Sistema de Ponto': 'Despesa_Fixa',
-    'Uniformes': 'Despesa_Variavel',
-    'Vale Transporte': 'Despesa_Fixa',
-    'Rescisao a Pagar': 'Despesa_Variavel',
-    'Emprestimo Consignado Colaborador Fgts': 'Despesa_Variavel',
-    'Caixa Síndico': 'Ignorar',
-
-    # ======================
-    # DESPESAS FIXAS CONDOMÍNIO
-    # ======================
-    'Honorarios Contabeis': 'Despesa_Fixa',
-    'Seguros': 'Despesa_Fixa',
-    'Sistema Interno Cond 21': 'Despesa_Fixa',
-    'Telefone/Internet': 'Despesa_Fixa',
-    'Sistema Interno Despesa_Cond 21': 'Despesa_Fixa',
-    'Energia Eletrica': 'Despesa_Fixa',  # recorrente
-    'Despesas c/ Servicos Terceiros (PJ)': 'Despesa_Fixa',
-
-    # ======================
-    # DESPESAS VARIÁVEIS
-    # ======================
-    'Combustivel/Lubrificantes/Troca Oleo ': 'Despesa_Variavel',
-    'Conservacao e Manutencao': 'Despesa_Variavel',
-    'Conservacao e manutencao de Motos': 'Despesa_Variavel',
-    'Conservação e Manutençao da Portaria': 'Despesa_Variavel',
-    'Correio': 'Despesa_Variavel',
-    'Despesas c/Chaveiro': 'Despesa_Variavel',
-    'Despesas com Assembleia': 'Despesa_Variavel',
-    'Despesas com transporte e entrega': 'Despesa_Variavel',
-    'Encadernaçao de livros': 'Despesa_Variavel',
-    'Fretes e Carretos': 'Despesa_Variavel',
-    'Lanches e Refeicoes': 'Despesa_Variavel',
-    'Locaçao de Equipamentos/ Veiculos': 'Despesa_Variavel',
-    'Material Eletrico': 'Despesa_Variavel',
-    'Material Hidraulico': 'Despesa_Variavel',
-    'Material de Construçao': 'Despesa_Variavel',
-    'Material de Copa': 'Despesa_Variavel',
-    'Material de Escritorio/Toner/Manutenção Impressora': 'Despesa_Variavel',
-    'Material de Segurança EPI': 'Despesa_Variavel',
-    'Material de divulgacao ': 'Despesa_Variavel',
-    'Material de limpeza': 'Despesa_Variavel',
-    'Moveis e Utensilios - Portaria ': 'Despesa_Variavel',
-    'Reembolso de Quilometragem': 'Despesa_Variavel',
-    'Servico Eletricista': 'Despesa_Variavel',
-    'Despesas c/ Servicos Terceiros (PF)': 'Despesa_Variavel',
-    'Combustivel/Lubrificantes/Troca Oleo': 'Despesa_Variavel',
-    'Material/Serviço Poco Artesiano': 'Despesa_Variavel',
-    'Material de divulgacao': 'Despesa_Variavel',
-    'Bens de Reduzido Valor': 'Despesa_Variavel',
-
-    # ======================
-    # Despesa_Imobilizado (não entra em custo mensal)
-    # ======================
-    'Material /Servico - Iluminação interna': 'Despesa_Imobilizado',
-    'Portão de acesso': 'Despesa_Imobilizado',
-    'Postes e Placas de Sinalização': 'Despesa_Imobilizado',
-    'Reforma Portaria': 'Despesa_Imobilizado',
-    'Aparelhos Celulares' : 'Despesa_Imobilizado',
-    'Moveis e Utensilios': 'Despesa_Imobilizado',
-    'Moveis e Utensilios - Portaria': 'Despesa_Imobilizado',
-
-    # ======================
-    # TRIBUTOS (curto prazo)
-    # ======================
-    'IOF/IRRF': 'Obrigacao_CP',
-    'IPTU': 'Obrigacao_CP',
-    'IPVA': 'Obrigacao_CP',
-    'IRRF': 'Obrigacao_CP',
-    'Multa e Juros': 'Despesa_Variavel',
-    'Tarifas Bancarias': 'Despesa_Variavel',
-    'Taxa de Alvara': 'Obrigacao_CP',
-    'Dae- Recursos Hidricos': 'Obrigacao_CP',
-    'Juros e Multa': 'Obrigacao_CP',
-
-    # ======================
-    # RECEITAS
-    # ======================
-    'Taxa Condominio Acordo administrativo': 'Receita',
-    'Taxa Consumo de Agua': 'Receita',
-    'Taxa de Condominio': 'Receita',
-    'Receita Reembolso Mercado Livre': 'Receita',
-    'Receitas de Aplicacoes Financeiras': 'Receita',
-    'Taxa Controle de Acesso': 'Receita',
-    'Taxa Espaço Gourmet': 'Receita',
-    'Taxa de instalacao de hidrometro': 'Receita',
-    'Taxa Multa': 'Receita'
-
-    # ======================
-    # APLICAÇÕES (tratar como Caixa)
-    # ======================
-    #'Aplicação Caixa Econômica Federal - resgate' : 'Disponivel',
-    #'Aplicação Caixa Econômica Federal' : 'Disponivel'
-}
-
-# Mapear a classificação analítica
-df["Classificacao_Analise"] = df["ContaNome"].map(mapa_analise).fillna("Nao_Classificado")
 
 # ===============================
 # 4️⃣ Ajuste de valores numéricos
@@ -309,7 +222,7 @@ else:
 # 8️⃣ Configuração de páginas
 # ===============================
 st.sidebar.title("Menu")
-pagina = st.sidebar.radio("Escolha a Página:", ["Dashboard", "Análise Contábil", "Bases"])
+pagina = st.sidebar.radio("Escolha a Página:", ["Dashboard", "Bases"])
 
 st.sidebar.markdown("### Filtros Globais")
 
@@ -333,9 +246,6 @@ st.sidebar.selectbox(
     disabled=st.session_state.tipo_despesa != "Todos"
 )
 
-# ===============================
-# Página 1: Dashboard
-# ===============================
 # ===============================
 # Página 1: Dashboard
 # ===============================
@@ -365,7 +275,6 @@ if pagina == "Dashboard":
     # 🔹 Bloco 3 - Resultado do Período
     # ===============================
     col5, col6, col7 = st.columns(3)
-
     total_receita = df_filtrado[df_filtrado["Categoria"].str.contains("Receita", na=False)]["Credito"].sum()
     total_despesa = df_filtrado[df_filtrado["Categoria"].str.contains("Despesa", na=False)]["Debito"].sum()
     resultado = total_receita - total_despesa
@@ -386,232 +295,373 @@ if pagina == "Dashboard":
     # ===============================
     st.markdown("---")
 
-    if st.session_state.periodo == "Todos":
-        mensal = df_graf.groupby(["Mes", "Categoria"])[["Debito", "Credito"]].sum().reset_index()
-        despesa = mensal[mensal["Categoria"].str.contains("Despesa")].groupby("Mes")["Debito"].mean().reset_index()
-        receita = mensal[mensal["Categoria"].str.contains("Receita")].groupby("Mes")["Credito"].mean().reset_index()
+    periodo_atual = str(st.session_state.periodo)
+    tipo_despesa = st.session_state.get("tipo_despesa", "Todos")
+    tipo_receita = st.session_state.get("tipo_receita", "Todos")
+
+    # ==========================================================
+    # 📊 CASO 1 — PERÍODO = "TODOS"  →  Gráfico de barras mensais
+    # ==========================================================
+    if periodo_atual == "Todos":
+        mensal = df_graf.groupby(["Mes", "Categoria"])[["Debito","Credito"]].sum().reset_index()
+        despesa = (
+            mensal[mensal["Categoria"].str.contains("Despesa", na=False)]
+            .groupby("Mes", as_index=False)["Debito"]
+            .sum()
+        )
+        receita = (
+            mensal[mensal["Categoria"].str.contains("Receita", na=False)]
+            .groupby("Mes", as_index=False)["Credito"]
+            .sum()
+        )
         graf_data = pd.merge(receita, despesa, on="Mes", how="outer").sort_values("Mes")
+        graf_data = graf_data.fillna(0)
         graf_data["Mes_str"] = graf_data["Mes"].astype(str)
 
-        fig = px.bar(
+        # 🔹 Definir título dinâmico conforme os filtros
+        if tipo_despesa != "Todos" and "Despesa" in tipo_despesa:
+            titulo = f"Detalhamento Mensal das {tipo_despesa.replace('_', ' ')}"
+            y_cols = ["Debito"]
+            color_map = {"Debito": CORES_CATEGORIA.get(tipo_despesa, "#FF4B4B")}
+        elif tipo_receita != "Todos" and "Receita" in tipo_receita:
+            titulo = f"Detalhamento Mensal das {tipo_receita.replace('_', ' ')}"
+            y_cols = ["Credito"]
+            color_map = {"Credito": CORES_CATEGORIA.get(tipo_receita, "#4CAF50")}
+        else:
+            titulo = "Receita x Despesa Média Mensal"
+            y_cols = ["Credito", "Debito"]
+            color_map = {
+                "Credito": CORES_CATEGORIA["Receita"],
+                "Debito": CORES_CATEGORIA["Despesa_Cond"]
+            }
+
+        # 🔹 Criar gráfico dinâmico com estilo padronizado
+        fig_receita_despesa = px.bar(
             graf_data,
             x="Mes_str",
-            y=["Credito", "Debito"],
+            y=y_cols,
             barmode="group",
             labels={"Mes_str": "Mês", "value": "R$"},
-            title="Receita x Despesa Média Mensal"
+            title=titulo,
+            color_discrete_map=color_map,
+            text_auto=".2f"
         )
-        st.plotly_chart(fig, use_container_width=True)
 
+        # 🔹 Formatação dos rótulos e tooltips
+        fig_receita_despesa.update_traces(
+            texttemplate="R$ %{y:,.2f}" if "Debito" in y_cols or "Credito" in y_cols else None,
+            textposition="outside",
+            hovertemplate="<b>Mês:</b> %{x}<br><b>Valor:</b> R$ %{y:,.2f}<extra></extra>",
+            marker_line_width=0.5,
+            marker_line_color="rgba(0,0,0,0.1)"
+        )
+
+        # 🔹 Layout geral (estilo semelhante aos gráficos horizontais)
+        fig_receita_despesa.update_layout(
+            title=dict(x=0.02, xanchor="left"),
+            xaxis_title=None,
+            yaxis_title="R$",
+            bargap=0.25,
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
+            font=dict(size=12),
+            legend=dict(
+                title=None,
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            )
+        )
+
+        st.plotly_chart(fig_receita_despesa, use_container_width=True)
+
+
+    # ==========================================================
+    # 📊 CASO 2 — PERÍODO ESPECÍFICO  →  Gráficos de pizza
+    # ==========================================================
     else:
-        df_mes = df_graf[df_graf["Mes"].astype(str) == st.session_state.periodo]
+        df_mes = df_graf[df_graf["Mes"].astype(str) == periodo_atual]
         df_despesa = df_mes[df_mes["Categoria"].str.contains("Despesa")].groupby("Categoria")[["Debito"]].sum().reset_index()
         df_receita = df_mes[df_mes["Categoria"].str.contains("Receita")].groupby("Categoria")[["Credito"]].sum().reset_index()
 
         col1, col2 = st.columns(2)
         with col1:
-            fig_desp = px.pie(
-                df_despesa, names="Categoria", values="Debito",
-                title=f"Distribuição de Débitos - {st.session_state.periodo}"
+            fig_pie_despesa = px.pie(
+                df_despesa,
+                names="Categoria",
+                values="Debito",
+                title=f"Distribuição de Despesas - {periodo_atual}",
+                hole=0.3,
+                color="Categoria",
+                color_discrete_map=CORES_CATEGORIA
             )
-            st.plotly_chart(fig_desp, use_container_width=True)
+            fig_pie_despesa = padronizar_grafico(fig_pie_despesa)
+            st.plotly_chart(fig_pie_despesa, use_container_width=True)
+
         with col2:
             fig_rec = px.pie(
-                df_receita, names="Categoria", values="Credito",
-                title=f"Distribuição de Créditos - {st.session_state.periodo}"
+                df_receita,
+                names="Categoria",
+                values="Credito",
+                title=f"Distribuição de Créditos - {periodo_atual}",
+                hole=0.3,
+                color="Categoria",
+                color_discrete_map=CORES_CATEGORIA
             )
+            fig_rec = padronizar_grafico(fig_rec)
             st.plotly_chart(fig_rec, use_container_width=True)
 
+    # ===============================
+    # 🔹 Exibição de KPIs ou gráfico detalhado
+    # ===============================
     st.markdown("---")
-    st.subheader("📊 Médias do Período")
 
-    # 🔹 Definir número de meses para média
-    n_meses = df_filtrado["Mes"].nunique() if periodo == "Todos" else 1
+    # ==========================================================
+    # CASO A — Tudo em "Todos" → Médias do período
+    # ==========================================================
+    if (
+        periodo_atual == "Todos"
+        and tipo_despesa == "Todos"
+        and tipo_receita == "Todos"
+    ):
+        st.subheader("📊 Médias do Período")
 
-    # 🔹 MÉDIAS DE RECEITA
-    receita_filtrada = df_filtrado[df_filtrado["Categoria"].str.contains("Receita", na=False)]
-    media_rec_total = receita_filtrada["Credito"].sum() / n_meses if not receita_filtrada.empty else 0
+        n_meses = df_filtrado["Mes"].nunique()
 
-    taxa_cond_filtrada = df_filtrado[df_filtrado["ContaNome"]=="Taxa de Condominio"]
-    media_rec_taxa_cond = taxa_cond_filtrada["Credito"].sum() / n_meses if not taxa_cond_filtrada.empty else 0
+        # === MÉDIAS DE RECEITA ===
+        receita_filtrada = df_filtrado[df_filtrado["Categoria"].str.contains("Receita", na=False)]
+        media_rec_total = receita_filtrada["Credito"].sum() / n_meses if not receita_filtrada.empty else 0
 
-    contas_taxa_acordo = [
-        "Taxa Condominio Acordo administrativo",
-        "Taxa Consumo de Agua",
-        "Receitas de Aplicacoes Financeiras",
-        "Multa e Juros",
-        "Taxa de instalacao de hidrometro",
-        "Taxa Controle de Acesso",
-        "Taxa Espaço Gourmet",
-        "Taxa Multa",
-        "Receita Reembolso Mercado Livre"
-    ]
-    taxa_acordo_filtrada = df_filtrado[df_filtrado["ContaNome"].isin(contas_taxa_acordo)]
-    media_rec_taxa_acordo = taxa_acordo_filtrada["Credito"].sum() / n_meses if not taxa_acordo_filtrada.empty else 0
+        taxa_cond_filtrada = df_filtrado[df_filtrado["ContaNome"] == "Taxa de Condominio"]
+        media_rec_taxa_cond = taxa_cond_filtrada["Credito"].sum() / n_meses if not taxa_cond_filtrada.empty else 0
 
-    # 🔹 MÉDIAS DE DESPESA
-    despesa_filtrada = df_filtrado[df_filtrado["Categoria"].str.contains("Despesa", na=False)]
-    media_desp_total = despesa_filtrada["Debito"].sum() / n_meses if not despesa_filtrada.empty else 0
+        contas_taxa_acordo = [
+            "Taxa Condominio Acordo administrativo",
+            "Taxa Consumo de Agua",
+            "Receitas de Aplicacoes Financeiras",
+            "Multa e Juros",
+            "Taxa de instalacao de hidrometro",
+            "Taxa Controle de Acesso",
+            "Taxa Espaço Gourmet",
+            "Taxa Multa",
+            "Receita Reembolso Mercado Livre"
+        ]
+        taxa_acordo_filtrada = df_filtrado[df_filtrado["ContaNome"].isin(contas_taxa_acordo)]
+        media_rec_taxa_acordo = taxa_acordo_filtrada["Credito"].sum() / n_meses if not taxa_acordo_filtrada.empty else 0
 
-    desp_dp_filtrada = df_filtrado[df_filtrado["Categoria"]=="Despesa_DP"]
-    media_desp_dp = desp_dp_filtrada["Debito"].sum() / n_meses if not desp_dp_filtrada.empty else 0
+        # === MÉDIAS DE DESPESA ===
+        despesa_filtrada = df_filtrado[df_filtrado["Categoria"].str.contains("Despesa", na=False)]
+        media_desp_total = despesa_filtrada["Debito"].sum() / n_meses if not despesa_filtrada.empty else 0
 
-    outras_desp_filtrada = df_filtrado[df_filtrado["Categoria"].isin(["Despesa_Cond","Despesa_Imobilizado","Despesa_Tributaria"])]
-    media_desp_outras = outras_desp_filtrada["Debito"].sum() / n_meses if not outras_desp_filtrada.empty else 0
+        desp_dp_filtrada = df_filtrado[df_filtrado["Categoria"] == "Despesa_DP"]
+        media_desp_dp = desp_dp_filtrada["Debito"].sum() / n_meses if not desp_dp_filtrada.empty else 0
 
-    # 🔹 Exibição em colunas
-    col1, col2, col3 = st.columns(3)
-    col1.metric("💰 Média Total Receita", f"R$ {media_rec_total:,.2f}")
-    col2.metric("💰 Média Taxa de Condomínio", f"R$ {media_rec_taxa_cond:,.2f}")
-    col3.metric("💰 Outras Receitas", f"R$ {media_rec_taxa_acordo:,.2f}")
+        outras_desp_filtrada = df_filtrado[df_filtrado["Categoria"].isin(["Despesa_Cond", "Despesa_Imobilizado", "Despesa_Tributaria"])]
+        media_desp_outras = outras_desp_filtrada["Debito"].sum() / n_meses if not outras_desp_filtrada.empty else 0
 
-    col4, col5, col6 = st.columns(3)
-    col4.metric("📉 Média Total Despesa", f"R$ {media_desp_total:,.2f}")
-    col5.metric("📉 Média Despesa DP", f"R$ {media_desp_dp:,.2f}")
-    col6.metric("📉 Outras Despesas", f"R$ {media_desp_outras:,.2f}")
+        # === Exibição KPI's ===
+        col1, col2, col3 = st.columns(3)
+        col1.metric("💰 Média Total Receita", f"R$ {media_rec_total:,.2f}")
+        col2.metric("💰 Média Taxa de Condomínio", f"R$ {media_rec_taxa_cond:,.2f}")
+        col3.metric("💰 Outras Receitas", f"R$ {media_rec_taxa_acordo:,.2f}")
 
+        col4, col5, col6 = st.columns(3)
+        col4.metric("📉 Média Total Despesa", f"R$ {media_desp_total:,.2f}")
+        col5.metric("📉 Média Despesa DP", f"R$ {media_desp_dp:,.2f}")
+        col6.metric("📉 Outras Despesas", f"R$ {media_desp_outras:,.2f}")
 
+    # ==========================================================
+    # CASO B — Período = "Todos" mas há filtro → Detalhamento consolidado
+    # ==========================================================
+    elif (
+        periodo_atual == "Todos"
+        and (tipo_despesa != "Todos" or tipo_receita != "Todos")
+    ):
+        st.subheader("📊 Detalhamento — Todos (Consolidado)")
 
+        df_mes = df_graf.copy()  # todos os meses, consolidado
 
-# ===============================
-# Página 2: Análise Contábil
-# ===============================
-if pagina == "Análise Contábil":
-    st.title("📊 Análise Contábil do Condomínio")
+        # --- Despesas detalhadas ---
+        df_despesa = (
+            df_mes[df_mes["Categoria"].str.contains("Despesa", na=False)]
+            .groupby("ContaNome", as_index=False)[["Debito"]]
+            .sum()
+            .sort_values("Debito", ascending=True)
+        )
 
-    # Criar coluna com classificação analítica
-    df["Classificacao_Analise"] = df["ContaNome"].map(mapa_analise)
-    
-    # Define o valor do caixa
-    total_disponivel = 108_838.91  # saldo em banco
+        if not df_despesa.empty:
+            df_despesa["Percentual"] = df_despesa["Debito"] / df_despesa["Debito"].sum() * 100
+            num_categorias_desp = len(df_despesa)
+            cores_desp_seq = px.colors.sequential.Oranges_r
+            cores_desp = [
+                cores_desp_seq[int(i * (len(cores_desp_seq) - 1) / max(1, num_categorias_desp - 1))]
+                for i in range(num_categorias_desp)
+            ]
 
+            fig_desp = px.bar(
+                df_despesa,
+                x="Debito",
+                y="ContaNome",
+                orientation='h',
+                labels={"Debito": "R$", "ContaNome": "Conta"},
+                title="Detalhamento de Despesas - Consolidado",
+                text="Debito",
+                custom_data=["Percentual"]
+            )
+            fig_desp.update_traces(
+                marker_color=cores_desp,
+                texttemplate="R$ %{x:,.2f}",
+                textposition="outside",
+                hovertemplate="<b>%{y}</b><br>R$ %{x:,.2f} (%{customdata[0]:.2f}%)<extra></extra>"
+            )
+            st.plotly_chart(fig_desp, use_container_width=True)
+        else:
+            st.info("Nenhuma despesa neste filtro.")
 
-    # -------------------------------
-    # Cálculos Consolidados
-    # -------------------------------
+        # --- Receitas detalhadas ---
+        df_receita = (
+            df_mes[df_mes["Categoria"].str.contains("Receita", na=False)]
+            .groupby("ContaNome", as_index=False)[["Credito"]]
+            .sum()
+            .sort_values("Credito", ascending=True)
+        )
 
-    obrigações_cp = df.loc[df["Classificacao_Analise"]=="Obrigacao_CP", "Debito"].sum()
-    despesas_fixas = df.loc[df["Classificacao_Analise"]=="Despesa_Fixa", "Debito"].sum()
-    despesas_variaveis = df.loc[df["Classificacao_Analise"]=="Despesa_Variavel", "Debito"].sum()
-    custo_operacional_mensal = despesas_fixas + despesas_variaveis
-    media_diaria_despesas = custo_operacional_mensal / 30
+        if not df_receita.empty:
+            df_receita["Percentual"] = df_receita["Credito"] / df_receita["Credito"].sum() * 100
+            num_categorias_rec = len(df_receita)
+            cores_rec_seq = px.colors.sequential.Greens_r
+            cores_rec = [
+                cores_rec_seq[int(i * (len(cores_rec_seq) - 1) / max(1, num_categorias_rec - 1))]
+                for i in range(num_categorias_rec)
+            ]
 
-    liquidez_corrente = total_disponivel / obrigações_cp
-    liquidez_liquida = total_disponivel - obrigações_cp
-    dias_de_caixa = total_disponivel / media_diaria_despesas
+            fig_receita = px.bar(
+                df_receita,
+                x="Credito",
+                y="ContaNome",
+                orientation='h',
+                labels={"Credito": "R$", "ContaNome": "Conta"},
+                title="Detalhamento de Receitas - Consolidado",
+                text="Credito",
+                custom_data=["Percentual"]
+            )
+            fig_receita.update_traces(
+                marker_color=cores_rec,
+                texttemplate="R$ %{x:,.2f}",
+                textposition="outside",
+                hovertemplate="<b>%{y}</b><br>R$ %{x:,.2f} (%{customdata[0]:.2f}%)<extra></extra>"
+            )
+            st.plotly_chart(fig_receita, use_container_width=True)
+        else:
+            st.info("Nenhuma receita neste filtro.")
 
-
-    # -------------------------------
-    # Exibição de métricas
-    # -------------------------------
-    col1, col2 = st.columns(2)
-    col1.metric("💰 Liquidez Corrente", f"{liquidez_corrente:.2f}")
-    col1.metric("📉 Liquidez Líquida", f"R$ {liquidez_liquida:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-    col2.metric("📆 Dias de Caixa", f"{dias_de_caixa:.0f} dias")
-    col2.metric("🏷️ Custo Operacional Mensal", f"R$ {custo_operacional_mensal:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-
-
-    # -------------------------------
-    # Preparar dados por mês
-    # -------------------------------
-    # Agrupar por mês (mantém Period para cálculos)
-    df["MesAno"] = df["Data"].dt.to_period("M")
-
-    df_despesas_mensal = df.groupby("MesAno").apply(
-        lambda x: pd.Series({
-            "Despesas_Fixas": x.loc[x["Classificacao_Analise"]=="Despesa_Fixa", "Debito"].sum(),
-            "Despesas_Variaveis": x.loc[x["Classificacao_Analise"]=="Despesa_Variavel", "Debito"].sum(),
-            "Obrigações_CP": x.loc[x["Classificacao_Analise"]=="Obrigacao_CP", "Debito"].sum()
-        })
-    ).reset_index()
-
-    # Coluna para exibir nos gráficos
-    df_despesas_mensal["MesAno_str"] = df_despesas_mensal["MesAno"].astype(str)
-
-
-    df_despesas_mensal["Total_Disponivel"] = total_disponivel
-    df_despesas_mensal["Liquidez_Corrente"] = df_despesas_mensal["Total_Disponivel"] / df_despesas_mensal["Obrigações_CP"].replace(0,np.nan)
-    df_despesas_mensal["Liquidez_Liquida"] = df_despesas_mensal["Total_Disponivel"] - df_despesas_mensal["Obrigações_CP"]
-    df_despesas_mensal["Custo_Operacional"] = df_despesas_mensal["Despesas_Fixas"] + df_despesas_mensal["Despesas_Variaveis"]
-    df_despesas_mensal["Dias_de_Caixa"] = df_despesas_mensal["Total_Disponivel"] / (df_despesas_mensal["Custo_Operacional"] / 30).replace(0,np.nan)
-
-    # -------------------------------
-    # Evolução Mensal de Liquidez e Custo
-    # -------------------------------
-    fig1 = px.line(
-        df_despesas_mensal,
-        x="MesAno_str",
-        y=["Liquidez_Corrente", "Custo_Operacional"],
-        labels={"value":"R$", "MesAno":"Mês"},
-        title="Evolução Mensal de Liquidez e Custo Operacional"
-    )
-    st.plotly_chart(fig1, use_container_width=True)
-
-    st.markdown("""
-    **Análise:** 
-    """)
-
-    # -------------------------------
-    # Disponível vs Obrigações
-    # -------------------------------
-    fig2 = px.bar(
-        df_despesas_mensal,
-        x="MesAno_str",
-        y=["Total_Disponivel","Obrigações_CP"],
-        barmode="group",
-        labels={"value":"R$", "MesAno":"Mês"},
-        title="Disponível x Obrigações de Curto Prazo"
-    )
-    st.plotly_chart(fig2, use_container_width=True)
-
-    st.markdown("""
-    **Análise:** 
-    """)
-
-    # -------------------------------
-    # Composição de despesas do último mês (Top 5 + Outros)
-    # -------------------------------
-    ult = df_despesas_mensal.iloc[-1]
-    df_ult = df[df["MesAno"] == ult["MesAno"]]
-    df_despesa = df_ult[df_ult["Classificacao_Analise"].str.contains("Despesa", na=False)].groupby("ContaNome")[["Debito"]].sum().reset_index()
-    df_despesa = df_despesa.sort_values("Debito", ascending=False)
-
-    top_n = 5
-    df_top = df_despesa.head(top_n)
-    df_outros = df_despesa.tail(len(df_despesa) - top_n)
-    if not df_outros.empty:
-        df_outros_sum = pd.DataFrame({"ContaNome":["Outros"], "Debito":[df_outros["Debito"].sum()]})
-        df_despesa_final = pd.concat([df_top, df_outros_sum], ignore_index=True)
+    # ==========================================================
+    # CASO C — Período específico → Detalhamento do mês
+    # ==========================================================
     else:
-        df_despesa_final = df_top
+        st.subheader(f"📊 Detalhamento — {periodo_atual}")
 
-    fig3 = px.pie(
-        df_despesa_final,
-        names="ContaNome",
-        values="Debito",
-        title=f"Distribuição de Despesas - {ult['MesAno']}",
-        hole=0.3,
-        color_discrete_sequence=px.colors.sequential.Reds
-    )
-    st.plotly_chart(fig3, use_container_width=True)
+        df_mes = df_graf[df_graf["Mes"].astype(str) == periodo_atual]
 
-    st.markdown("""
-    **Análise:** 
-    """)
+        # --- Despesas detalhadas ---
+        df_despesa = (
+            df_mes[df_mes["Categoria"].str.contains("Despesa", na=False)]
+            .groupby("ContaNome", as_index=False)[["Debito"]]
+            .sum()
+            .sort_values("Debito", ascending=True)
+        )
+
+        if not df_despesa.empty:
+            df_despesa["Percentual"] = df_despesa["Debito"] / df_despesa["Debito"].sum() * 100
+            num_categorias_desp = len(df_despesa)
+            cores_desp_seq = px.colors.sequential.Oranges_r
+            cores_desp = [
+                cores_desp_seq[int(i * (len(cores_desp_seq) - 1) / max(1, num_categorias_desp - 1))]
+                for i in range(num_categorias_desp)
+            ]
+
+            fig_desp = px.bar(
+                df_despesa,
+                x="Debito",
+                y="ContaNome",
+                orientation='h',
+                labels={"Debito": "R$", "ContaNome": "Conta"},
+                title=f"Detalhamento de Despesas - {periodo_atual}",
+                text="Debito",
+                custom_data=["Percentual"]
+            )
+            fig_desp.update_traces(
+                marker_color=cores_desp,
+                texttemplate="R$ %{x:,.2f}",
+                textposition="outside",
+                hovertemplate="<b>%{y}</b><br>R$ %{x:,.2f} (%{customdata[0]:.2f}%)<extra></extra>"
+            )
+            st.plotly_chart(fig_desp, use_container_width=True)
+        else:
+            st.info("Nenhuma despesa neste filtro.")
+
+        # --- Receitas detalhadas ---
+        df_receita = (
+            df_mes[df_mes["Categoria"].str.contains("Receita", na=False)]
+            .groupby("ContaNome", as_index=False)[["Credito"]]
+            .sum()
+            .sort_values("Credito", ascending=True)
+        )
+
+        if not df_receita.empty:
+            df_receita["Percentual"] = df_receita["Credito"] / df_receita["Credito"].sum() * 100
+            num_categorias_rec = len(df_receita)
+            cores_rec_seq = px.colors.sequential.Greens_r
+            cores_rec = [
+                cores_rec_seq[int(i * (len(cores_rec_seq) - 1) / max(1, num_categorias_rec - 1))]
+                for i in range(num_categorias_rec)
+            ]
+
+            fig_receita = px.bar(
+                df_receita,
+                x="Credito",
+                y="ContaNome",
+                orientation='h',
+                labels={"Credito": "R$", "ContaNome": "Conta"},
+                title=f"Detalhamento de Receitas - {periodo_atual}",
+                text="Credito",
+                custom_data=["Percentual"]
+            )
+            fig_receita.update_traces(
+                marker_color=cores_rec,
+                texttemplate="R$ %{x:,.2f}",
+                textposition="outside",
+                hovertemplate="<b>%{y}</b><br>R$ %{x:,.2f} (%{customdata[0]:.2f}%)<extra></extra>"
+            )
+            st.plotly_chart(fig_receita, use_container_width=True)
+        else:
+            st.info("Nenhuma receita neste filtro.")
 
 # ===============================
 # Página 3: Bases
 # ===============================
 if pagina == "Bases":
-    st.subheader("📄 Base Filtrada")
-    st.dataframe(df_filtrado)
+    st.subheader("📄 Bases de Dados")
 
-    st.subheader("📄 Consolidação por Categoria")
-    st.dataframe(cat_summary_filtrado)
+    with st.expander("📊 Base Filtrada"):
+        st.caption(f"{len(df_filtrado):,} registros — Período: {st.session_state.periodo}")
+        st.dataframe(df_filtrado)
 
-    st.subheader("📄 Consolidação por Categoria e Conta")
-    st.dataframe(conta_summary_filtrado)
+    with st.expander("📊 Consolidação por Categoria"):
+        st.dataframe(cat_summary_filtrado)
 
-    st.subheader("📄 Percentual de cada Conta na Categoria")
-    st.dataframe(percentual_categoria_filtrado)
+    with st.expander("📊 Consolidação por Categoria e Conta"):
+        st.dataframe(conta_summary_filtrado)
+
+    with st.expander("📊 Percentual de cada Conta na Categoria"):
+        st.dataframe(percentual_categoria_filtrado)
+
+    st.download_button(
+        "⬇️ Baixar Base Filtrada (CSV)",
+        data=df_filtrado.to_csv(index=False).encode("utf-8"),
+        file_name="base_filtrada.csv",
+        mime="text/csv"
+    )
 
